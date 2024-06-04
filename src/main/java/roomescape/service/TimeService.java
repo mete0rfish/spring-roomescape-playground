@@ -3,6 +3,7 @@ package roomescape.service;
 import org.springframework.stereotype.Service;
 import roomescape.domain.Times;
 import roomescape.dto.SaveTimeRequest;
+import roomescape.dto.TimeResponse;
 import roomescape.exception.NotFoundTimeException;
 import roomescape.repository.TimeRepository;
 
@@ -14,8 +15,9 @@ public class TimeService {
         this.timeRepository = timeRepository;
     }
 
-    public Times saveTime(SaveTimeRequest request) {
-        return timeRepository.save(request.toTimes());
+    public TimeResponse saveTime(SaveTimeRequest request) {
+        Times time = timeRepository.save(request.toTimes());
+        return TimeResponse.from(time);
     }
 
     public Times findById(Long id) {
@@ -24,5 +26,9 @@ public class TimeService {
             throw new NotFoundTimeException("시간이 존재하지 않습니다.");
         }
         return time;
+    }
+
+    public void deleteById(int id) {
+        timeRepository.deleteById(id);
     }
 }

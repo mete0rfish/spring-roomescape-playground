@@ -7,6 +7,7 @@ import roomescape.domain.Times;
 import roomescape.dto.SaveTimeRequest;
 import roomescape.dto.TimeResponse;
 import roomescape.repository.TimeRepository;
+import roomescape.service.TimeService;
 
 import java.net.URI;
 import java.util.List;
@@ -14,10 +15,10 @@ import java.util.List;
 @Controller
 public class TimeController {
 
-    private final TimeRepository timeRepository;
+    private final TimeService timeService;
 
-    public TimeController(TimeRepository timeRepository) {
-        this.timeRepository = timeRepository;
+    public TimeController(TimeService timeService) {
+        this.timeService = timeService;
     }
 
     @GetMapping("/times/home")
@@ -25,23 +26,16 @@ public class TimeController {
         return "time";
     }
 
-    @GetMapping("/times")
-    public ResponseEntity<List<Times>> getAllTimes(){
-        final List<Times> times = timeRepository.findAll();
-        return ResponseEntity.ok(times);
-    }
-
     @PostMapping("/times")
     public ResponseEntity<TimeResponse> createTimes(@RequestBody SaveTimeRequest request){
         // TODO create TimeResponse
-        Times times = timeRepository.save(request.toTimes());
-        TimeResponse response = TimeResponse.from(times);
-        return ResponseEntity.created(URI.create("/times/" + times.getId())).body(response);
+        TimeResponse response = timeService.saveTime(request);
+        return ResponseEntity.created(URI.create("/times/" + response.id())).body(response);
     }
 
     @DeleteMapping("/times/{id}")
     public ResponseEntity<String> deleteTimesById(@PathVariable int id){
-        timeRepository.deleteById(id);
+        timeService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
